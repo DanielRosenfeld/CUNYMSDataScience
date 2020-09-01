@@ -1,0 +1,33 @@
+---
+title: "Historical Presidential Election Polls"
+author: "Dan Rosenfeld"
+date: "8/31/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I wanted to take a look at historical presidential election poll data from Fivethirtyeight.
+https://fivethirtyeight.com/features/how-to-read-2020-polls-like-a-pro/
+
+Clearly, there are many considerations to take into account when analyzing polls, though I want to know if quantity necessarily equals quality. I am curious about the total number of polls taken in each presidential cycle, and if the modern political age is different in this regard from the past.
+
+```{r cycles}
+## Referencing code from Armenoush Aslanian-Persico 2016 assignment https://rpubs.com/aapsps/151233
+x <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/polls/pres_pollaverages_1968-2016.csv")
+
+years_analyzed <- unique(x$cycle)
+years_analyzed
+```
+
+## Including Plots
+
+In the histogram below, you can clearly see that the number of polls in the database greatly increased with the 1992 presidential election.
+
+```{r hist}
+hist(x$cycle)
+```
+
+Further analysis is required to determine if more polling has necessarily led to more accurate polling. As my skill with R increases I want to compare this historical polling data to actual election results, to see if quantity does have any relationship to quality. 
