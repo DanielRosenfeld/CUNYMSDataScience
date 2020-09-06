@@ -1,0 +1,102 @@
+---
+title: "DATA 607 Assignment 2"
+author: "Dan Rosenfeld"
+date: "9/6/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Movie Preferences
+
+First I set up a [Google form](https://docs.google.com/forms/d/e/1FAIpQLScWww5eU623-mYltiZnj0PX8r-PNDUlpdlI-kwQMgPU988y3Q/viewform) to collect audience feedback on six recent populat movies. I downloaded those responses as a .csv and then loaded them into MYSQL Workbench, on a server I set up through Google cloud platform SQL.
+![Google Cloud Platform SQL](/Users/danielrosenfeld/Desktop/Screen Shot 2020-09-06 at 4.03.25 PM.png)
+
+I created a database and table to accept the data using the following MYSQL code. 
+![Create database and table](/Users/danielrosenfeld/Desktop/Screen Shot 2020-09-06 at 3.52.00 PM.png)
+
+![Create database and table](/Users/danielrosenfeld/Desktop/Screen Shot 2020-09-06 at 3.52.48 PM.png)
+
+
+I then loaded the MYSQL table into RStudio below.
+
+```{r mydb}
+#library(RSQLite)
+#library(RMySQL)
+#mydb = dbConnect(MySQL(), user=' mysql-test', password='dev', dbname='GCP SQL', host='localhost')
+```
+
+I couldn't get this connection to work, so I loaded the movie_pref data as a csv.
+## Including Plots
+
+
+```{r movie_pref, echo=FALSE}
+movie_pref <- read.csv("/Users/danielrosenfeld/Downloads/movie_pref.csv")
+summary(movie_pref)
+
+```
+
+
+## Modifying Data
+
+
+```{r modifying_data, echo=FALSE}
+#colnames(movie_pref)
+library("naniar")
+na_strings <- c("Haven't seen it")
+movie_pref_nona <- movie_pref %>%
+  replace_with_na_all(condition = ~.x %in% na_strings)
+
+
+```
+
+## Let's see the mean ratings for each movie.
+
+```{r black_panther, echo=FALSE}
+library(tidyverse)
+library(ArArRedux)
+black_panther <- as.numeric(movie_pref_nona$Black.Panther..2018.)
+# Black Panther
+black_panther
+black_panther_mean <- mean(black_panther,na.rm = TRUE)
+black_panther_mean
+# Hidden Figures
+hidden_figures <- as.numeric(movie_pref_nona$Hidden.Figures..2016.)
+hidden_figures
+hidden_figures_mean <- mean(hidden_figures, na.rm = TRUE)
+hidden_figures_mean
+# Avengers Endgame
+avengers_endgame <- as.numeric(movie_pref_nona$Avengers..Endgame..2019.)
+avengers_endgame
+avengers_endgame_mean <- mean(avengers_endgame, na.rm = TRUE)
+avengers_endgame_mean
+# Knives Out
+knives_out <- as.numeric(movie_pref_nona$Knives.Out..2019.)
+knives_out
+knives_out_mean <- mean(knives_out, na.rm = TRUE)
+knives_out_mean
+
+# Da 5 Bloods
+da_5_bloods <- as.numeric(movie_pref_nona$Da.5.Bloods..2020.)
+da_5_bloods
+da_5_bloods_mean <- mean(da_5_bloods, na.rm = TRUE)
+da_5_bloods_mean
+
+# Wonder Woman
+wonder_woman <- as.numeric(movie_pref_nona$Wonder.Woman..2017.)
+wonder_woman
+wonder_woman_mean <- mean(wonder_woman, na.rm = TRUE)
+wonder_woman_mean
+
+# Creating mean rating data frame
+movieid <- 1:6
+movie <- c("BlackPanther", "HiddenFigures", "AvengersEndgame", "KnivesOut", "Da5Bloods", "WonderWoman")
+mean_rating <- c(4.428571, 4.285714, 4.4, 4.25, 4.5, 4.5)
+DataFrame.movie_ratings <- data.frame(movieid, movie, mean_rating)
+
+DataFrame.movie_ratings
+
+
+```
