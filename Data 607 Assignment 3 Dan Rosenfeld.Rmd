@@ -1,0 +1,135 @@
+---
+title: "Assignment 3, Strings and Dates"
+author: "Dan Rosenfeld"
+date: "9/12/2020"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1 Data and Statistics, College Majors
+
+After reading the 2014 Fivethirtyeight article [The Economic Guide To Picking A College Major](https://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/) by Ben Casselman regarded the vastly unequal income prospects across college majors, my goal is to better understand the economic prospects facing graduates with data and statistics majors. I'll begin by importing the data from the [Fivethirtyeight Github](https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/recent-grads.csv).
+
+```{r 1, results='hide'}
+
+library(tidyverse)
+library(stringr)
+library(knitr)
+
+# Import majors.
+majors <- read_csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/recent-grads.csv")
+
+# Select majors for first table.
+majors_table <- majors %>% select(1, 3:7,16)
+majors_table10 <- majors_table[1:10,]
+
+
+
+
+
+```
+
+```{r 1.5}
+
+kable(majors_table10, caption = "Top 10 Earning Majors" )
+
+# Search strings for data and statistics.
+datamajors <- str_subset(majors$Major, ".DATA.")
+statsmajors <- str_subset(majors$Major, ".STATISTICS.")
+
+dsmajors <- c(datamajors, statsmajors)
+dsmajors
+
+```
+
+We can see that Computer Programming and Data Processing is the only major to include data or statistics in the name.
+
+## 2 Transforming Strings
+
+My aim is to transform the following data:
+
+[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+
+[13] "olive"        "salal berry"
+
+Into a format like this:
+
+c("bell pepper", "bilberry", "blackberry", "blood orange", "blueberry", "cantaloupe", "chili pepper", "cloudberry", "elderberry", "lime", "lychee", "mulberry", "olive", "salal berry")
+
+
+```{r 2, echo=FALSE}
+
+#First I loaded pasted the data into a csv file and loaded it into R.
+berrys_raw <- read_csv("/Users/danielrosenfeld/Downloads/berrys.csv")
+
+berrys_raw
+```
+
+Next I extracted all of the words from the new tibble berrys_raw.
+
+```{r 2.5, echo=FALSE} 
+berrys1 <- str_extract_all(berrys_raw, boundary("word"))
+berrys1
+
+
+
+
+```
+
+More work needs to be done here to fully parse out the berries.
+
+## 3 
+
+Describe, in words, what these expressions will match:
+
+(.)\1\1
+"(.)(.)\\2\\1"
+(..)\1
+"(.).\\1.\\1"
+"(.)(.)(.).*\\3\\2\\1"
+
+The first regular expression will match a period that will be repeated once.
+
+The second will match a string of four periods that is repeated once.
+
+The third will match three periods.
+
+The fourth will match a string of .). repeated once.
+
+The fifth will match .)(.)(.).* repeated three times, then twice, then once.
+
+
+```{r 3, echo=FALSE}
+
+
+```
+
+## 4
+
+Construct regular expressions to match words that:
+
+Start and end with the same character.
+Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)
+Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.)
+
+^a$
+abcd\\2
+a\\1\\3
+
+```{r 4, echo=FALSE}
+
+
+
+
+
+
+
+```
