@@ -1,0 +1,41 @@
+---
+title: "Project 1"
+author: "Dan Rosenfeld"
+date: "9/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Project 1
+
+My goal is to import the log of Chess matches and calculate updated ELO scores for the players.
+
+```{r Import}
+library(readr)
+library(knitr)
+library(tidyverse)
+
+# First I'll read in the Chess txt file that I placed on Github.
+# I want to note that each data point is separated by four spaces.
+chesstxt <- "Chess.txt"
+(chess <- read_table(chesstxt,skip = 10))
+colnames(chess)
+view(chess)
+
+
+
+?read_table()
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
