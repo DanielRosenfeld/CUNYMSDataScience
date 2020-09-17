@@ -25,6 +25,6 @@ chesstxt <- "Chess.txt"
 (chess <- read_table(chesstxt,skip = 10))
 colnames(chess)
 view(chess)
-
+```
 
 
