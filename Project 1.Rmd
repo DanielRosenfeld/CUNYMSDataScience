@@ -20,6 +20,7 @@ library(tidyverse)
 
 # First I'll read in the Chess txt file that I placed on Github.
 # I want to note that each data point is separated by four spaces.
+# I still need to change the import so that it's coming from Github and not my local machine.
 chesstxt <- "Chess.txt"
 (chess <- read_table(chesstxt,skip = 10))
 colnames(chess)
@@ -27,15 +28,3 @@ view(chess)
 
 
 
-?read_table()
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
