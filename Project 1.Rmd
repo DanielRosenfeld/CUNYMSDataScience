@@ -1,30 +1,151 @@
 ---
 title: "Project 1"
 author: "Dan Rosenfeld"
-date: "9/15/2020"
-output: html_document
+date: "`r Sys.Date()`"
+output: 
+  openintro::lab_report: default
+  html_document:
+    number_sections: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+## Project 1 - Chess Match Data Analysis
 
-## Project 1
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
 
-My goal is to import the log of Chess matches and calculate updated ELO scores for the players.
+My goal is to import the log of chess matches and calculate updated ELO scores for all players. I'll begin by importing the .txt file of matches from Github and parsing out the data that is largely separated by pipes, accents, and white spaces.
 
-```{r Import}
+Final .csv export should be in this format:
+
+*Player Name | State | Total Points | Pre-Rating | Avg Opp Pre-Rating*
+
+Example: *Gary Hua, ON, 6.0, 1794, 1605*
+
+Collaborators: Jered Ataky, Magnus Skonberg, Rick Sughrue
+
+</div> \hfill\break
+```{r setup_libs, include=FALSE}
+library(tidyverse)
 library(readr)
 library(knitr)
-library(tidyverse)
+```
+# 1: Importing and cleaning the data
 
-# First I'll read in the Chess txt file that I placed on Github.
-# I want to note that each data point is separated by four spaces.
-# I still need to change the import so that it's coming from Github and not my local machine.
-chesstxt <- "Chess.txt"
-(chess <- read_table(chesstxt,skip = 10))
-colnames(chess)
-view(chess)
+
+First I'll read in the chess .txt file that I placed on Github.
+```{r Import, echo=TRUE}
+# Import the data from Github.
+chessUrl <- "https://raw.githubusercontent.com/DanielRosenfeld/CUNYMSDataScience/master/Chess"
+chess <- read.table(url(chessUrl), sep = ",")
+
+head(chess)
+```
+
+# 2: Remove headers and white space
+
+Every third line is just dashed lines, I will remove those as well as the header. I'll also remove extra white spaces.
+```{r}
+# Remove the first three lines to remove the header.
+chess <- chess[-c(1:4),]
+# Remove every third line (the dashed lines).
+i <- seq(0, 192, 3)
+chess <- chess[-i]
+#Compress white space for readability
+chess <- str_replace_all(chess, "\\s+", " ")
+head(chess)
 ```
 
 
+# 3: Sort by even and odd rows
+
+The odd and even rows have different variables, I'll separate them in order to make extracting variables easier.
+
+```{r}
+# Separate out the odd and even rows.
+o_rows <- seq(1, 128, 2)
+e_rows <- seq(2, 128, 2)
+  
+o_chess <- unlist(data.frame(x=chess[o_rows]))
+e_chess <- unlist(data.frame(x=chess[e_rows]))
+head(o_chess)
+head(e_chess)
+```
+
+
+
+# 4. Extract essential fields from each vector
+
+*Player Name | State | Total Points | Pre-Rating*
+
+and later *Avg Opp Pre-Rating*.
+
+```{r}
+# Extract player IDs: 
+id<-unlist(str_extract_all(o_chess,"\\d{1,2} \\| "))
+id<-unlist(str_extract_all(id, "\\d{1,2}"))
+head(id)
+# Extract player names:
+name <-unlist(str_extract_all(o_chess,"\\w+ ?\\w+ \\w+"))
+head(name)
+# Extract player point total:
+pt_total <-unlist(str_extract_all(o_chess,"\\d.\\d"))
+head(pt_total)
+# Extract player state:
+state <-unlist(str_extract_all(e_chess, " \\w{2} \\| "))
+state<-unlist(str_extract_all(state, "\\w{2}"))
+head(state)
+# Extract player pre-rating:
+prerating <-unlist(str_extract_all(e_chess, "(R:\\s*)(\\d+)"))
+prerating <-as.numeric(unlist(str_extract_all(prerating, "(\\d+)")))
+head(prerating)
+```
+
+
+# 5. Compute average opponent ranking
+
+I'll create a matrix of opponent data,
+
+```{r}
+# Extract the entire row from the pt_total onward, set missing values @ B,H,U and X to be " 0" and then extract digits.
+opp_ids<-unlist(str_extract_all(o_chess,"\\|[0-9].*"))
+opp_ids<-str_replace_all(opp_ids, "[BHUX]", " 0")
+opp_ids<-str_extract_all(opp_ids,"\\s\\d{1,2}")
+# Convert into numeric matrix and from 64 x 7 to 7 x 64.
+opp_ids_m <- matrix(unlist(opp_ids),  byrow= TRUE, nrow = length(opp_ids))
+opp_ids_m <- t(apply(opp_ids_m, 1, as.numeric))
+# Use embedded for loops to iterate over rows and columns. If the entry is 0, replace it with NA. Otherwise, replace the id# with its corresponding preratings.
+for (i in 1:nrow(opp_ids_m)) {
+  for (j in 1:ncol(opp_ids_m)) {
+    if (opp_ids_m[i,j] == 0){
+      opp_ids_m[i,j] = NA
+    } else {
+      opp_ids_m[i,j] <- prerating[opp_ids_m[i,j]]
+    }
+  }
+}
+
+# Take the average value per row while omitting missing values.
+avg_opp_rating <- c(rowMeans(opp_ids_m, na.rm = TRUE))
+avg_opp_rating <- round(avg_opp_rating)
+head(avg_opp_rating)
+```
+
+# 6. Combine desired components into dataframe and export to .csv.
+
+```{r}
+#Combine desired components into dataframe
+combined <- data.frame(name, state, pt_total, prerating, avg_opp_rating)
+colnames(combined) <- c("Player Name", "Player State", "Point Total", "Pre Rating", "Avg Opponent Rating")
+head(combined)
+
+#write.csv(combined,"chess_new_ratings.csv", row.names = FALSE)
+```
+
+Summary: It seems like there are two main ways to go about parsing out the variables from the text file. You can either separate the data into odd and even rows and use relatively simple regexes to parse out the desired variables, or you can use more complicated regex expressions to parse out the variables without separating the dataset into odd and even rows.
+
+Thank you to my collaborators on this project.
