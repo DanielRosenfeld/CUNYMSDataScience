@@ -1,0 +1,7 @@
+{ 
+   "Title":["Candide", "Metamorphosis", "R for Data Science: Import, Tidy, Transform, Visualize, and Model Data"],
+   "Author":["Voltaire","Franz Kafka","Hadley Wickham"],
+   "Author2":["","","Garrett Grolemund"],
+   "PublicationYear":[ "1759","1915","2017"],
+   "OriginalLanguage":[ "French","German","English"]
+}
