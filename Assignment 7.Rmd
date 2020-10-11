@@ -1,0 +1,74 @@
+---
+title: "Assignment 7"
+author: "Dan Rosenfeld"
+date: "10/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment 7
+
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 20px;}
+</style>
+<div class = "blue">
+
+I'll begin by selecting three of my favorite books and ascertaining their title, author(s), publication year, and the year they were originally published. First I will import these variables in a JSON file, then XML, and finally an HTML table.
+
+</div> \hfill\break
+
+```{r Importing Libraries, echo=FALSE}
+library(tidyverse)
+library(stringr)
+library(rjson)
+library(XML)
+library(methods)
+library(htmltab)
+library(RCurl)
+library(rlist)
+```
+
+## Importing books as a JSON
+
+```{r JSON}
+# I'll begin by importing three of my favorite books, including one that has multiple authors
+# 1. Candide by Voltaire
+# 2. Metamorphosis by Franz Kafka
+# 3. R for Data Science: Import, Tidy, Transform, Visualize, and Model Data by Hadley Wickham & Garrett Grolemund
+
+# I wrote out the JSON file using the Sublime text editor and placed it on Github at #https://raw.githubusercontent.com/DanielRosenfeld/CUNYMSDataScience/master/Assignment7Books.json
+# I referenced the tutorial at https://www.tutorialspoint.com/r/r_json_files.htm , shared by Cassie Boylan on our class slack channel.
+
+booksjsonurl <- url("https://raw.githubusercontent.com/DanielRosenfeld/CUNYMSDataScience/master/Assignment7Books.json")
+
+booksjson <- fromJSON(file = booksjsonurl)
+
+(books_json_data_frame <- as.data.frame(booksjson))
+
+```
+
+## Importing books as XML
+
+
+```{r XML}
+# Next I'll import the same data as an XML file.
+# I also wrote it out in the Sublime text editor.
+# I used another tutorial that Cassie Boylan shared, at https://www.tutorialspoint.com/r/r_xml_files.htm .
+# I uploaded the file to Github at https://raw.githubusercontent.com/DanielRosenfeld/CUNYMSDataScience/master/Assignment7BooksXML.xml
+
+
+xmlurl <- getURL("https://raw.githubusercontent.com/DanielRosenfeld/CUNYMSDataScience/master/Assignment7BooksXML.xml",.opts = list(ssl.verifypeer = FALSE) )
+
+# Couldn't get this file parsed out as a table.
+(booksxml <- xmlParse(file = xmlurl))
+```
+
+```{r html}
+# Finally I'll load the html table that I created of the same books in Sublime text editor.
+htmlurl <- getURL("https://raw.githubusercontent.com/DanielRosenfeld/CUNYMSDataScience/master/Assignment7Books.html",.opts = list(ssl.verifypeer = FALSE) )
+htmlbooks <- readHTMLTable(htmlurl)
+htmlbooks
+```
